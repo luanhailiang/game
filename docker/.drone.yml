@@ -1,0 +1,87 @@
+kind: pipeline
+type: docker
+name: default
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: alpine/git
+  network_mode: host
+  commands:
+  - git clone --depth 1 --branch ${DRONE_BRANCH} ${DRONE_REPO_LINK} .
+  - git checkout $DRONE_COMMIT
+  when:
+    branch:
+    - master
+    event:
+    - push
+- name: build-rust
+  image: rust:1.62
+  network_mode: host
+  commands:
+  - cargo install --path .
+  when:
+    branch:
+    - master
+    event:
+    - push
+- name: package room
+  image: plugins/docker
+  network_mode: host
+  settings:
+    registry: docker.clhero.fun
+    username: lkk
+    password: lkk123
+    repo: docker.clhero.fun/hero/micro_lobby_room
+    tags: ${DRONE_BRANCH}
+    context: ./
+    dockerfile: docker/Dockerfile
+  when:
+    branch:
+    - master
+    event:
+    - push
+- name: apply ansible playbook
+  image: plugins/ansible:1
+  network_mode: host
+  settings:
+    playbook: docker/ansible/playbook.yml
+    inventory: docker/ansible/inventory/${DRONE_BRANCH}.ini
+    private_key:
+      from_secret: ansible_private_key
+  when:
+    branch:
+    - master
+    event:
+    - push
+- name: wechat
+  image: lizheming/drone-wechat
+  settings:
+    corpid: ww3978c9c75de3e90a
+    corp_secret: IeM-eUjwzaF_8XrTbSfksI1vqAefFaCxcDszPciQz7o
+    agent_id: 1000011
+    to_user: "@all"
+    title: >
+     {% if success %}
+     ✅ {{repo.owner}}/{{repo.name}} 第 {{build.number}} 次构建成功！
+     {% else %}
+     ❌ {{repo.owner}}/{{repo.name}} 第 {{build.number}} 次构建失败！
+     {% endif %}
+    message: >
+      {% if success %}
+        # {{build.started | datetime}}
+        @{{build.author}}，{{build.branch}} 构建成功！可以开始测试了😊
+      {% else %}
+        # {{build.started | datetime}}
+        @{{build.author}}，{{build.branch}} 构建失败！赶紧修理一下吧😭
+      {% endif %}
+  when:
+    branch:
+    - master
+    event:
+    - push
+    status:
+    - success
+    - failure

@@ -1,0 +1,36 @@
+[package]
+name = "micro_room"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jwt = "0.16.0"
+hmac = "0.12.1"
+sha2 = "0.10.2"
+redis = "0.21.5"
+bevy_ecs = "0.8.0"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+mlua = { version = "0.8.3", features = ["lua54", "vendored","serialize"] }
+
+tungstenite = "0.17.3"
+futures-channel = "0.3.21"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+tokio-tungstenite = "*"
+tokio = { version = "1.20.1", features = ["full"] }
+tonic = "0.8.0"
+prost = "0.11.0"
+
+my_macro = { path = "./macro" }
+
+[build-dependencies]
+tonic-build = "0.8.0"
+
+[features]
+default = ["protojson"]
+protojson = []
+
+[[bin]]
+name = "app"
+path = "src/main.rs"

@@ -1,0 +1,5 @@
+- hosts: server
+  tasks:
+  - name: start room
+    shell: | 
+        cd /root/micro/lobby/ && docker compose pull room --ignore-pull-failures && docker compose up -d room

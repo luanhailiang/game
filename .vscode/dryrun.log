@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/lkk/code/micro_room'
+make: Leaving directory '/home/lkk/code/micro_room'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

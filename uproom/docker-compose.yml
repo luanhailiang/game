@@ -1,0 +1,24 @@
+version: '3.1'
+volumes:
+  db-redis:
+services:
+  redis:
+    image: redis:6.2.6
+    restart: unless-stopped 
+    ports:
+      - "46379:6379"
+    volumes:
+      - db-redis:/data
+  room:
+    image: docker.clhero.fun/hero/micro_lobby_room:master
+    build: 
+      context: ../
+      dockerfile: ./uproom/Dockerfile
+    environment:
+      - SERVE_NAME=info
+      - DEBUG_LOG=true
+      - REDIS_ADDR=redis:6379
+      - NO_SPACE=true
+    ports:
+      - 48787:2794
+

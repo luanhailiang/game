@@ -1,0 +1,43 @@
+syntax = "proto3";
+package command;
+
+
+message BuffMessage{
+    string name = 1;
+    bytes  data = 2;
+}
+message BackMessage{
+    uint32 code = 1;
+    string info = 2;
+    BuffMessage buff = 3;
+}  
+
+
+
+//Call Login 当前链接登录
+//jwt token 解析玩家信息，并加入频道
+//jwt key放到环境变量
+message CmdLogin {
+    string token = 1;
+    int32  plat  = 2;   //ios 0 /android 1
+}
+
+// //Call Enter 进入房间
+// message CmdEnter {
+//     int32 type = 1;     //玩法
+// }
+
+// //Call Leave 离开房间
+// message CmdLeave {
+//     // int32 type = 1;
+// }
+
+//Call Heart 心跳空包，活跃检查
+message CmdHeart {
+    int64 time = 1;
+}
+
+//Call break 客户端断线通知回调
+message SynBreak {
+    int32 type = 1;         //推出类型(0:正常，1:重复，2:防沉迷，3:GM)
+}
